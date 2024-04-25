@@ -1,6 +1,6 @@
 #include "binsearch.h"
 
-int binsearch(int* a, int key, int size) {
+int binsearch(int* a, int key, unsigned int size) {
   
   int low = 0;
   int high = size - 1;

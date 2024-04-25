@@ -4,7 +4,7 @@
 
 int main () {
   int a[MAX_SIZE];
-  int SIZE = nondet_int();
+  unsigned int SIZE = nondet_uint();
   __CPROVER_assume(SIZE > 0);
   __CPROVER_assume(SIZE <= MAX_SIZE);
   int k = nondet_int();
