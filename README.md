@@ -20,7 +20,7 @@ This invokes the "bugginator" to produce over 80 likely-buggy versions of `binse
 To check the code using cbmc, just type:
 
 ```
-cbmc binsearch_cbmc.c binsearch.c --unwind 12 --bounds-check --pointer-check
+cbmc binsearch_cbmc.c binsearch.c --unwind 12 --bounds-check --pointer-check --unwinding-assertions
 ```
 
 If you alter 'MAX_SIZE` you'll need to alter the unwinding depth, too.
@@ -74,7 +74,7 @@ Finally, how do you check the mutants?
 For cbmc, it's easy:
 
 ```
-analyze_mutants binsearch.c "cbmc binsearch_cbmc.c binsearch.c --unwind 12 --bounds-check --pointer-check" --timeout 20 --verbose --mutantDir mutants
+analyze_mutants binsearch.c "cbmc binsearch_cbmc.c binsearch.c --unwind 12 --bounds-check --pointer-check --unwinding-assertions" --timeout 600 --verbose --mutantDir mutants
 ```
 
 This will take some time!
@@ -82,7 +82,7 @@ This will take some time!
 To look at the mutants not detected (thus possible holes in the specification or harness):
 
 ```
-show_mutants unkilled.txt
+show_mutants unkilled.txt --mutantDir mutants
 ```
 
 The same approach will work with DeepState:
@@ -90,3 +90,6 @@ The same approach will work with DeepState:
 ```
 analyze_mutants binsearch.c "make clean; make test_binsearch; ./test_binsearch --fuzz --timeout 15 --abort_on_fail" --timeout 20 --verbose --mutantDir mutants
 ```
+
+Both CBMC and DeepState should detect more than 80% of the mutants as
+faulty, suggesting we have a fairly strong specification.
