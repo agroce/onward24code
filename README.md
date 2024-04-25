@@ -92,4 +92,16 @@ analyze_mutants binsearch.c "make clean; make test_binsearch; ./test_binsearch -
 ```
 
 Both CBMC and DeepState should detect more than 80% of the mutants as
-faulty, suggesting we have a fairly strong specification.
+faulty, suggesting we have a fairly strong specification.  DeepState's
+results will vary, due to the nature of random value generation.  CBMC
+should consistently detect almost 93% of  the mutants: when it is
+possible, proof can be more powerful than testing.  The undetected
+mutants in some cases are genuinely equivalent.  The one other case
+converts binary search into a very strange linear search with
+additional requirements, suggesting the omission of performance
+testing is a serious issue with our approach.
+
+The (undocumented, at least for now) code in the `advanced` directory
+shows a start on trying to verify binary search, including
+performance, for unbounded array sizes (up to index type size in any
+case), thus covering the Bloch case also.
