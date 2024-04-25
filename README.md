@@ -26,3 +26,67 @@ cbmc binsearch_cbmc.c binsearch.c --unwind 12 --bounds-check --pointer-check
 If you alter 'MAX_SIZE` you'll need to alter the unwinding depth, too.
 
 Using DeepState is a bit more complex.  First you have to build the various test executables.  The included Makefile does this for you, however.  So, to run one test (the "default test") of binary search, you just type:
+
+```
+make
+./test_binsearch
+```
+
+You should see something like:
+
+```
+TRACE: Running: Run_Bentley from binsearch_deepstate.cpp(10)
+TRACE: binsearch_deepstate.cpp(16): SIZE = 1
+TRACE: binsearch_deepstate.cpp(20): a[0] = 0
+TRACE: binsearch_deepstate.cpp(25): Sorting...
+TRACE: binsearch_deepstate.cpp(28): a[0] = 0
+TRACE: binsearch_deepstate.cpp(35): k = 0
+TRACE: binsearch_deepstate.cpp(36): present = 1
+TRACE: binsearch_deepstate.cpp(39): r = 0
+TRACE: Passed: Run_Bentley
+```
+
+To use DeepState's built-in (very dumb, not coverage-driven) fuzzer:
+
+```
+./test_binsearch --fuzz --timeout 30
+```
+
+You'll see something like:
+
+```
+INFO: Starting fuzzing
+WARNING: No seed provided; using 1714058690
+WARNING: No test specified, defaulting to first test defined (Run_Bentley)
+INFO: Done fuzzing! Ran 1391568 tests (46385 tests/second) with 0 failed/1391568 passed/0 abandoned tests
+```
+
+Finally, to fuzz the binary search using AFL++, a very good coverage-driven mutation-based fuzzer:
+
+```
+deepstate-afl ./fuzz_binsearch -o fuzzing_output --fuzzer_out
+```
+
+Stop the fuzzer with Ctrl-C.
+
+Finally, how do you check the mutants?
+
+For cbmc, it's easy:
+
+```
+analyze_mutants binsearch.c "cbmc binsearch_cbmc.c binsearch.c --unwind 12 --bounds-check --pointer-check" --timeout 20 --verbose --mutantDir mutants
+```
+
+This will take some time!
+
+To look at the mutants not detected (thus possible holes in the specification or harness):
+
+```
+show_mutants unkilled.txt
+```
+
+The same approach will work with DeepState:
+
+```
+analyze_mutants binsearch.c "make clean; make test_binsearch; ./test_binsearch --fuzz --timeout 15 --abort_on_fail" --timeout 20 --verbose --mutantDir mutants
+```
