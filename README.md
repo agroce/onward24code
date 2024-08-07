@@ -105,3 +105,18 @@ The (undocumented, at least for now) code in the `advanced` directory
 shows a start on trying to verify binary search, including
 performance, for unbounded array sizes (up to index type size in any
 case), thus covering the Bloch case also.
+
+**ADDENDUM**
+
+You can also try binary-based mutation using [MuttFuzz](https://github.com/agroce/muttfuzz).  One nice thing with this approach is that the problem of equivalent mutants --
+mutants that change source code but not meaningful program semantics -- is much less of an issue when mutants all involve changing
+binary-level jumps in a program.  Change a reachale jump instruction and you probably have a seriously different problem!
+
+To play with this:
+
+```
+pip install muttfuzz --upgrade
+muttfuzz "rm -rf fuzz; deepstate-afl ./fuzz_binsearch -o fuzz --timeout 30; ./fuzz_binsearch --input_test_files_dir fuzz/the_fuzzer/crashes/ --abort_on_fail && ./fuzz_binsearch --input_test_files_dir fuzz/the_fuzzer/queue/ --abort_on_fail && ./fuzz_binsearch --input_test_files_dir fuzz/the_fuzzer/hangs/ --abort_on_fail" ./fuzz_binsearch --score --time_per_mutant 80 --source_only_mutate binsearch --avoid_repeats --stop_on_repeat
+```
+
+The upgrade is there because muttfuzz is more of a work-in-progress than the other tools, so grabbing the latest before using it is a good idea.  This will actually run through all the binary-level jump mutants of the binsearch code.  If you are curious about exploring the mutants more, create a directory and add `--save_mutants <dir>` to the muttfuzz arguments.
