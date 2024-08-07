@@ -6,7 +6,7 @@ The easiest way to work with this code is to use a docker image with DeepState, 
 ```
 docker pull agroce/onward24_docker
 docker run -it agroce/onward24_docker
-cd onward24code
+cd ~/onward24code
 ```
 
 The image already has mutants generated for `binsearch.c` in the `mutants` directory.  You can generate them yourself:
